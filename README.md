@@ -14,7 +14,7 @@ The first step is to register the adapter:
 
 ### 2- Adapter Options
 
-Next step is to add the adapter options. There are 2 required options that you must configure, the **slack_webhook** and the **slack_channel* option. 
+Next step is to add the adapter options. There are 2 required options that you must configure, the **webhook_url** option. 
 The rest of the options are optional. Refer the table below for the full list of available options for this adapter.
 
 <img width="1955" alt="Image" src="https://github.com/user-attachments/assets/3a8d57e2-9fb1-4fce-8fcf-03368f3765e5" />
@@ -27,6 +27,6 @@ The following table shows the available options for this adapter
 | jennifer_url  | NO            | Optional: Set JENNIFER View Server URL for the X-View pop-up | None 
 
 
-The following is an example of the slack message received from this adapter.
+The following is an example of the teams message received from this adapter.
 
 <img width="961" alt="Image" src="https://github.com/user-attachments/assets/c0fff6ff-049d-4f1d-a42c-43a1f517fa5b" />
