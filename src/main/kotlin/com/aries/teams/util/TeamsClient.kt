@@ -42,7 +42,7 @@ class TeamsClient
 
             // JSONObject를 사용하여 Teams 메시지 생성
             val jsonMessage = teamsData.toString()
-            
+
             // 출력 스트림에 JSON 쓰기
             DataOutputStream(connection.outputStream).use { out ->
                 out.write(jsonMessage.toByteArray(StandardCharsets.UTF_8))
@@ -51,9 +51,11 @@ class TeamsClient
 
             val `in` = connection.inputStream
             val reader = BufferedReader(InputStreamReader(`in`))
-            var line: String
+            var line: String? = null
             val response = StringBuilder()
-            while ((reader.readLine().also { line = it }) != null) response.append(line + "\n")
+            while (reader.readLine()?.also { line = it } != null) {  // 안전 호출 연산자 ?. 추가
+                response.append(line + "\n")
+            }
 
             reader.close()
             return response.toString()

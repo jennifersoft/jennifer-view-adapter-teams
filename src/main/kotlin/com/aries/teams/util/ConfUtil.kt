@@ -30,8 +30,14 @@ object ConfUtil {
      * @return SlackProp slack properties
      */
     fun getTeamsProperties(): TeamsProp {
-        teamsProperties.webHookUrl = getValue("slack_webhook", null)
-        teamsProperties.shareUrl = getValue("share_url", null)
+        teamsProperties.webHookUrl = getValue("webhook_url", null)
+        teamsProperties.shareUrl = getValue("jennifer_url", null)
+        return teamsProperties
+    }
+
+    fun _getTeamsProperties(): TeamsProp {
+        teamsProperties.webHookUrl = getValue("webhook_url", "https://jennifer5.webhook.office.com/webhookb2/0b01b64b-c941-4988-a360-c242f341fa60@fb9a94cd-eba0-41db-b029-9b6c35225ea5/IncomingWebhook/955bf3571a0e42cbb07e7bdfd3a56016/491388af-67ce-443e-a15c-b8072411abb0/V27H-M8LwVaj13mKiKW0QRTPRIPGAaJqZF8cVJ7MWL2ng1")
+        teamsProperties.shareUrl = getValue("jennifer_url", "http://127.0.0.1:7901")
         return teamsProperties
     }
 }

@@ -29,8 +29,9 @@ class TeamsAdapter : EventHandler {
 
             val teamsMessage = TeamsData(teamsProperties, message, pretext, event)
             val result = TeamsClient(teamsMessage).push().trim { it <= ' ' }
-            if (!result.trim { it <= ' ' }
-                    .equals("ok", ignoreCase = true)) LogUtil.error("Failed to push message to Teams")
+            if (result.isEmpty() || result != "1") {
+                LogUtil.error("Failed to push message to Teams. Response: $result")
+            }
         }
     }
 
