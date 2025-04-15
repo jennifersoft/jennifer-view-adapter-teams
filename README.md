@@ -24,7 +24,7 @@ The following table shows the available options for this adapter
 | Key           | Required      | Description |  Default Value 
 | ------------- |:-------------:|:-------------:|:-------------:|
 | webhook_url   | YES           | Set Teams Incoming Webhook URL | None 
-| jennifer_url  | NO            | Optional: Set JENNIFER Share URL for the X-View pop-up. If the URL value is set, then this adapter will attempt to generate link to view the transactions in X-View and display the link in the slack message | None 
+| jennifer_url  | NO            | Optional: Set JENNIFER View Server URL for the X-View pop-up | None 
 
 
 The following is an example of the slack message received from this adapter.
