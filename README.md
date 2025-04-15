@@ -5,7 +5,7 @@ This adapter will send EVENT notification to a teams board.
 
 ### 1- Adapter Installation
 The first step is to register the adapter: 
-1. In JENNIFER Dashboard, open the management area and Navigate to  **Extension and Notice** > **Adapter and Plugin**
+1. In JENNIFER Dashboard, open the management area and Navigate to  **Settings** > **SMTP and Adapter (+DB Plan)**
 2. Make sure the **Adapter** tab is selected then click the **[+Add]** button
 3. Click the **Save** button to add the adapter. 
 
