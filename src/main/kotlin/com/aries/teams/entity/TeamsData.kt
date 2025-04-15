@@ -33,7 +33,7 @@ class TeamsData(
     }
 
     private fun addAttachments() {
-        if (prop.shareUrl != null && event.txid != -1L) {
+        if (prop.shareUrl != null && event.txid != -1L && event.txid != 0L) {
             val popupUrl = "/popup/xviewAnalysisV2?domainId=" + event.domainId +
                     "&transactionId=" + event.txid + "&searchTime=" + event.time
             val link = prop.shareUrl + popupUrl + "&redirect=" + encodeURIComponent(popupUrl)
