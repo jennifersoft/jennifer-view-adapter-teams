@@ -85,7 +85,9 @@ class TeamsClient(
                 }
             }
         } catch (ex: Exception) {
-            LogUtil.error("Error while pushing message to Teams: ${ex.message}", ex)
+            // Exception 스택트레이스를 문자열로 변환
+            val stackTrace = ex.stackTraceToString()
+            LogUtil.error("Error while pushing message to Teams: ${ex.message}\nStack trace: $stackTrace")
             return ""
         } finally {
             connection?.disconnect()

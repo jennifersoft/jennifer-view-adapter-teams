@@ -6,7 +6,6 @@
 
     <groupId>com.aries</groupId>
     <artifactId>teams-adapter</artifactId>
-    <!-- 버전 업데이트: 2.0.0 (AdaptiveCard 마이그레이션) -->
     <version>2.0.0</version>
 
     <name>teams-adapter</name>
@@ -39,35 +38,19 @@
             <version>${kotlin.version}</version>
             <scope>provided</scope>
         </dependency>
+        <!-- JSON 처리를 위한 org.json 라이브러리 -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20231013</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
+        <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
+        
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.1.1</version>
-                <configuration>
-                    <artifactSet>
-                        <excludes>
-                            <exclude>com.aries:extension:*</exclude>
-                            <exclude>org.apache.velocity:*</exclude>
-                            <exclude>org.apache.commons:*</exclude>
-                            <exclude>org.slf4j:*</exclude>
-                            <exclude>org.jetbrains.kotlin:*</exclude>
-                        </excludes>
-                    </artifactSet>
-                    <outputFile>${plugin.output.directoryName}/${plugin.output.fileName}.${project.packaging}</outputFile>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
@@ -124,6 +107,31 @@
                     <source>7</source>
                     <target>7</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.1.1</version>
+                <configuration>
+                    <artifactSet>
+                        <excludes>
+                            <exclude>com.aries:extension:*</exclude>
+                            <exclude>org.apache.velocity:*</exclude>
+                            <exclude>org.apache.commons:*</exclude>
+                            <exclude>org.slf4j:*</exclude>
+                            <exclude>org.jetbrains.kotlin:*</exclude>
+                        </excludes>
+                    </artifactSet>
+                    <outputFile>${plugin.output.directoryName}/${plugin.output.fileName}.${project.packaging}</outputFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
