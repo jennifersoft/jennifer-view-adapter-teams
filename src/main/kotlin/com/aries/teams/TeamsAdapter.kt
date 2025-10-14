@@ -10,17 +10,13 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 /**
- * The main logic for the extension
- *
+ * Teams Event Adapter for JENNIFER
+ * Version 2.0 - AdaptiveCard format
  */
 class TeamsAdapter : EventHandler {
-    /**
-     * Format the date and time
-     */
     private val sdf = SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
 
     override fun on(eventData: Array<EventData>) {
-//		val teamsProperties = ConfUtil._getTeamsProperties();
         val teamsProperties = ConfUtil.getTeamsProperties()
 
         for (event in eventData) {
@@ -28,31 +24,36 @@ class TeamsAdapter : EventHandler {
             val pretext = getPreText(event)
 
             val teamsMessage = TeamsData(teamsProperties, message, pretext, event)
-            val result = TeamsClient(teamsMessage).push().trim { it <= ' ' }
+            val result = TeamsClient(teamsMessage).push().trim()
+            
             if (result.isEmpty() || result != "1") {
-                LogUtil.error("Failed to push message to Teams. Response: $result")
+                LogUtil.error("Failed to push message to Teams. Check logs for details.")
             }
         }
     }
 
+    /**
+     * AdaptiveCard의 TextBlock은 markdown을 지원하지만
+     * 코드 블록(```)은 지원하지 않으므로 일반 텍스트로 변경
+     */
     private fun getBody(event: EventData): String {
         val messageBody = StringBuilder()
-        messageBody.append(String.format("```Domain ID: %d%n", event.domainId))
-        messageBody.append(String.format("Domain Name: %s%n", event.domainName))
-        messageBody.append(String.format("Instance Name: %s%n", event.instanceName))
-        messageBody.append(String.format("Transaction ID: %d%n", event.txid))
-        messageBody.append(String.format("Service Name: %s%n", event.serviceName))
-        messageBody.append(String.format("Error Type: %s%n", event.errorType))
-        messageBody.append(String.format("Error Level: %s%n", event.eventLevel))
-        messageBody.append(String.format("Error Time: %s%n", sdf.format(Date(event.time))))
+        
+        // AdaptiveCard에서 보기 좋게 줄바꿈과 구분선 사용
+        messageBody.append("**Domain ID:** ${event.domainId}\n\n")
+        messageBody.append("**Domain Name:** ${event.domainName}\n\n")
+        messageBody.append("**Instance Name:** ${event.instanceName}\n\n")
+        messageBody.append("**Transaction ID:** ${event.txid}\n\n")
+        messageBody.append("**Service Name:** ${event.serviceName}\n\n")
+        messageBody.append("**Error Type:** ${event.errorType}\n\n")
+        messageBody.append("**Error Level:** ${event.eventLevel}\n\n")
+        messageBody.append("**Error Time:** ${sdf.format(Date(event.time))}")
+        
         return messageBody.toString()
     }
 
     private fun getPreText(event: EventData): String {
-        val pretext = StringBuilder()
-        pretext.append(String.format("The following event [%s] was caught by JENNIFER. %n", event.errorType))
-        pretext.append("Here are some additional details\n")
-        return pretext.toString()
+        return "⚠️ JENNIFER Event Alert: ${event.errorType}"
     }
 
     companion object {

@@ -6,10 +6,11 @@
 
     <groupId>com.aries</groupId>
     <artifactId>teams-adapter</artifactId>
-    <version>1.0.0</version>
+    <!-- 버전 업데이트: 2.0.0 (AdaptiveCard 마이그레이션) -->
+    <version>2.0.0</version>
 
     <name>teams-adapter</name>
-    <description>Adapter to send Event notifications to a teams channel or user</description>
+    <description>Adapter to send Event notifications to Teams (AdaptiveCard format)</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

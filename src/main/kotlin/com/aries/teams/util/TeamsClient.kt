@@ -10,22 +10,21 @@ import java.net.URL
 import java.nio.charset.StandardCharsets
 
 /**
- * Slack Client for pushing message to slack
- *
+ * Teams Client for pushing message to Teams
+ * Supports both O365 Connectors and Power Automate Workflows
  */
-class TeamsClient
-/**
- * Default constructor
- * @param message SlackMessage object
- */(
-    /**
-     * SlackMessage instance
-     */
+class TeamsClient(
     private val teamsData: TeamsData
 ) {
+    companion object {
+        // Power Automate Workflow는 더 느릴 수 있음
+        private const val CONNECT_TIMEOUT = 10000  // 10초
+        private const val READ_TIMEOUT = 10000     // 10초
+    }
+
     /**
-     * Push message to slack using simple URLConnection
-     * @return Return either "ok" if message was sent, or null if message was not sent or an exception occured.
+     * Push message to Teams using URLConnection
+     * @return "1" if successful, empty string if failed
      */
     fun push(): String {
         var connection: HttpURLConnection? = null
@@ -33,37 +32,78 @@ class TeamsClient
             val url = URL(teamsData.prop.webHookUrl)
             connection = url.openConnection() as HttpURLConnection
             connection.requestMethod = "POST"
-            connection.connectTimeout = 5000
-            connection.readTimeout = 5000
-            connection.setRequestProperty("Content-Type", "application/json; utf-8")
+            connection.connectTimeout = CONNECT_TIMEOUT
+            connection.readTimeout = READ_TIMEOUT
+            connection.setRequestProperty("Content-Type", "application/json; charset=utf-8")
             connection.setRequestProperty("Accept", "application/json")
             connection.useCaches = false
             connection.doOutput = true
 
-            // JSONObject를 사용하여 Teams 메시지 생성
             val jsonMessage = teamsData.toString()
+            
+            // 디버깅을 위한 로깅 (개발 환경에서만 활성화)
+            // LogUtil.debug("Sending to Teams: $jsonMessage")
 
-            // 출력 스트림에 JSON 쓰기
             DataOutputStream(connection.outputStream).use { out ->
                 out.write(jsonMessage.toByteArray(StandardCharsets.UTF_8))
                 out.flush()
             }
 
-            val `in` = connection.inputStream
-            val reader = BufferedReader(InputStreamReader(`in`))
-            var line: String? = null
-            val response = StringBuilder()
-            while (reader.readLine()?.also { line = it } != null) {  // 안전 호출 연산자 ?. 추가
-                response.append(line + "\n")
+            val responseCode = connection.responseCode
+            
+            // 응답 코드에 따른 처리
+            when (responseCode) {
+                HttpURLConnection.HTTP_OK, 
+                HttpURLConnection.HTTP_ACCEPTED -> {
+                    // 성공적으로 전송됨
+                    val response = readResponse(connection.inputStream)
+                    LogUtil.info("Successfully sent message to Teams. Response: $response")
+                    return "1"
+                }
+                HttpURLConnection.HTTP_BAD_REQUEST -> {
+                    val errorResponse = readResponse(connection.errorStream)
+                    LogUtil.error("Bad Request (400): Invalid AdaptiveCard format or webhook URL. Response: $errorResponse")
+                    return ""
+                }
+                HttpURLConnection.HTTP_NOT_FOUND -> {
+                    LogUtil.error("Not Found (404): Webhook URL not found or expired. Please regenerate webhook URL.")
+                    return ""
+                }
+                429 -> {  // Too Many Requests
+                    LogUtil.error("Rate limit exceeded (429): Too many requests to Teams webhook.")
+                    return ""
+                }
+                HttpURLConnection.HTTP_UNAUTHORIZED, 
+                HttpURLConnection.HTTP_FORBIDDEN -> {
+                    LogUtil.error("Unauthorized/Forbidden ($responseCode): Check webhook URL permissions.")
+                    return ""
+                }
+                else -> {
+                    val errorResponse = readResponse(connection.errorStream)
+                    LogUtil.error("Unexpected response code: $responseCode. Response: $errorResponse")
+                    return ""
+                }
             }
-
-            reader.close()
-            return response.toString()
         } catch (ex: Exception) {
-            LogUtil.error("Error while pushing message. Reason : $ex")
+            LogUtil.error("Error while pushing message to Teams: ${ex.message}", ex)
             return ""
         } finally {
             connection?.disconnect()
+        }
+    }
+
+    /**
+     * 응답 스트림을 읽어서 문자열로 반환
+     */
+    private fun readResponse(inputStream: java.io.InputStream?): String {
+        if (inputStream == null) return ""
+        
+        return try {
+            BufferedReader(InputStreamReader(inputStream)).use { reader ->
+                reader.readText()
+            }
+        } catch (e: Exception) {
+            ""
         }
     }
 }
