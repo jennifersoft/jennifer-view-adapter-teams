@@ -6,7 +6,7 @@ import java.io.BufferedReader
 import java.io.DataOutputStream
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
-import java.net.URL
+import java.net.URI
 import java.nio.charset.StandardCharsets
 
 /**
@@ -29,7 +29,8 @@ class TeamsClient(
     fun push(): String {
         var connection: HttpURLConnection? = null
         try {
-            val url = URL(teamsData.prop.webHookUrl)
+            // URI를 사용하여 URL 생성 (deprecated 경고 해결)
+            val url = URI(teamsData.prop.webHookUrl).toURL()
             connection = url.openConnection() as HttpURLConnection
             connection.requestMethod = "POST"
             connection.connectTimeout = CONNECT_TIMEOUT
