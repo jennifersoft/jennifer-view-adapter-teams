@@ -19,15 +19,25 @@ class TeamsAdapter : EventHandler {
     override fun on(eventData: Array<EventData>) {
         val teamsProperties = ConfUtil.getTeamsProperties()
 
-        for (event in eventData) {
-            val message = getBody(event)
-            val pretext = getPreText(event)
+        // webhook URL 검증
+        if (teamsProperties.webHookUrl.isNullOrEmpty()) {
+            LogUtil.error("Teams webhook_url is not configured. Please set webhook_url in adapter configuration.")
+            return
+        }
 
-            val teamsMessage = TeamsData(teamsProperties, message, pretext, event)
-            val result = TeamsClient(teamsMessage).push().trim()
-            
-            if (result.isEmpty() || result != "1") {
-                LogUtil.error("Failed to push message to Teams. Check logs for details.")
+        for (event in eventData) {
+            try {
+                val message = getBody(event)
+                val pretext = getPreText(event)
+
+                val teamsMessage = TeamsData(teamsProperties, message, pretext, event)
+                val result = TeamsClient(teamsMessage).push().trim()
+
+                if (result.isEmpty() || result != "1") {
+                    LogUtil.error("Failed to push message to Teams. Check logs for details.")
+                }
+            } catch (e: Exception) {
+                LogUtil.error("Error processing event: ${e.message}")
             }
         }
     }
@@ -38,7 +48,7 @@ class TeamsAdapter : EventHandler {
      */
     private fun getBody(event: EventData): String {
         val messageBody = StringBuilder()
-        
+
         // AdaptiveCard에서 보기 좋게 줄바꿈과 구분선 사용
         messageBody.append("**Domain ID:** ${event.domainId}\n\n")
         messageBody.append("**Domain Name:** ${event.domainName}\n\n")
@@ -48,7 +58,7 @@ class TeamsAdapter : EventHandler {
         messageBody.append("**Error Type:** ${event.errorType}\n\n")
         messageBody.append("**Error Level:** ${event.eventLevel}\n\n")
         messageBody.append("**Error Time:** ${sdf.format(Date(event.time))}")
-        
+
         return messageBody.toString()
     }
 

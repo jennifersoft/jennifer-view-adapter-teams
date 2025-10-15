@@ -56,9 +56,12 @@ class TeamsClient(
             when (responseCode) {
                 HttpURLConnection.HTTP_OK, 
                 HttpURLConnection.HTTP_ACCEPTED -> {
-                    // 성공적으로 전송됨
                     val response = readResponse(connection.inputStream)
-                    LogUtil.info("Successfully sent message to Teams. Response: $response")
+                    if (response.isEmpty()) {
+                        LogUtil.info("Successfully sent message to Teams (Response code: $responseCode). Empty response body is normal for Power Automate Workflows.")
+                    } else {
+                        LogUtil.info("Successfully sent message to Teams. Response: $response")
+                    }
                     return "1"
                 }
                 HttpURLConnection.HTTP_BAD_REQUEST -> {

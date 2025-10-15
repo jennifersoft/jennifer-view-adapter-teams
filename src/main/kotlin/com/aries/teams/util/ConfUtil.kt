@@ -9,7 +9,6 @@ import com.aries.teams.entity.TeamsProp
 object ConfUtil {
     private val teamsProperties = TeamsProp()
 
-
     /**
      * The adapter ID
      */
@@ -19,15 +18,19 @@ object ConfUtil {
      * Get a configuration value using the provided key
      * @param key configuration key. Set this key value in the adapter configuration menu in JENNIFER client.
      * @param defaultValue Optional default configuration value
-     * @return String configuration value
+     * @return String? configuration value (nullable)
      */
-    fun getValue(key: String?, defaultValue: String?): String {
-        return PropertyUtil.getValue(ADAPTER_ID, key, defaultValue)
+    fun getValue(key: String?, defaultValue: String?): String? {
+        return try {
+            PropertyUtil.getValue(ADAPTER_ID, key, defaultValue)
+        } catch (e: Exception) {
+            defaultValue
+        }
     }
 
     /**
-     * Get the slack properties
-     * @return SlackProp slack properties
+     * Get the teams properties
+     * @return TeamsProp teams properties
      */
     fun getTeamsProperties(): TeamsProp {
         teamsProperties.webHookUrl = getValue("webhook_url", null)
